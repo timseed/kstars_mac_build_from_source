@@ -3,26 +3,28 @@
 I have a Mac M2 Silicon, and I would like to compile kStars from source.
 The version of KStars is   3.8.1
 
-## Prerequisits
+## Prerequisite's
 
 I am going to assume you are a programmer or at least technical on a pc.... if not, err good luck.
 
 Next, my environment for development is set as the following
 
 - QT Installed as a **NATIVE** package i.e. ~/Dev/QT_Compiler
-  - NOT I repeat NOT using brew for provide QT
+  - **NOT** I repeat *NOT* using brew for provide QT
   - I am using QT 6.10.1 (QT5 is too old imho)
 - brew is installed, and I use for general packages, eigen etc. But **NOT** for QT
-- openCV was build from source not using brew, as this pulled in QT6 :$
--
+  - openCV was build from source not using brew, as this pulled in QT6 
+  - I have a typical development base with brew (cmake cmake-extras etc) 
 
 ## Get kstars Source
 
-A simple git pull will get you the Kstars repo
+A simple git clone
 
-    cd ~/Dev/C++Astro   #Or where you want to build from 
+	cd ~/Dev/C++/Astro # Or where you want 
     git clone https://github.com/KDE/kstars 
-    cd kstars   
+    cd kstars #We are now in the main source folder
+
+
 
 As the CMake commands can get a little complex - I usually use a small bash script to make this more repeatable
 
@@ -40,7 +42,7 @@ This script is executable i.e. **chmod +x t.sh**
 
 ```bash
 #/bin/bash
-PATH=/Users/tim/Dev/QtCompiler/6.10.1/macos/bin:$PATH
+PATH=~/Dev/QtCompiler/6.10.1/macos/bin:$PATH
 
 export KF6_PREFIX=$HOME/kf6
 QT_ROOT=$(qmake6 -query QT_INSTALL_PREFIX)
@@ -81,15 +83,15 @@ If the package is found ...
 
 I am sorry that I do not have a list of packages I have installed, but as I have already been coding in FITS/Indi etc.... it is probably best you assemble this for yourself.
 
-**Until** you get the **KF6 Framework** not found.
+**Until** you get the **KF6 Framework** not found. This is a whole different issue.... 
 
 # KF6 Framework
 
-You may have noticed at the top of my build script there was an env setting for KF6,
+You may have noticed at the top of my build script there was an env setting for KF6 (shame if you did not see it).
 
     export KF6_PREFIX=$HOME/kf6
 
-I tried to get kf6 to install via brew, but I could not get it to work (maybe you can); So I took a *very* deep breath and decided to install KF6 manually !!
+I tried to get kf6 to install via brew, but I could not get it to work (maybe you can); So I took a *very* deep breath and decided to install KF6 manually !! I had removed all KF6 from brew before I attempted this.
 
 ## KF6 FrameWork build
 
@@ -102,7 +104,7 @@ And now I created another *cmake helper* script (also called *t.sh*)
 
 ```t.sh
 #!/bin/bash
-PATH=/Users/tim/Dev/QtCompiler/6.10.1/macos/bin:$PATH
+PATH=~/Dev/QtCompiler/6.10.1/macos/bin:$PATH
 QT_ROOT=$(qmake6 -query QT_INSTALL_PREFIX)
 cmake .. \
   -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt \
@@ -114,9 +116,9 @@ cmake --build . -j$(sysctl -n hw.ncpu)
 cmake --install .
 ```
 
-The next thing I have eventually worked out if the build order, KStars complained that it needed Kio NewStuff Plotting (and others) So I tried to just build those items, but of course they have pre-requisites. This is the order that I came up with.
+KStars complained that it needed Kio NewStuff Plotting (and others) So I tried to just build those items, but of course they have pre-requisites. This is the order that I came up with.
 
-So I believe you need to build in this Order.
+So I believe you need to build in this Order - please note I am not an expert of KF6/KDE
 
 - kcoreaddons
 - kconfig
@@ -128,27 +130,29 @@ So I believe you need to build in this Order.
 - kitemviews
 - kcodecs
 - kcolorscheme
-- breeze-icons (CMakeError: Python3 not Python\ 3. Use Virtual Python Env and install lxml)
+- breeze-icons 
 - kiconthemes
 - kconfigwidgets
 - kxmlgui
 - kcompletion
-- solid (brew install bison; Alter path to find new version. Then start build)
+- solid 
 - kwindowsystem
-- kdocbook (brew install docbook docbook-xsl libxslt fop; Lots of messing around due to languages. I cheated only build english - sorry)
+- kdocbook 
 - kbookmarks
 - knotifications
 - kjobwidgets
 - khelp
 - kdbusaddons
-- kded (Language file issue: All Removed except en_GB)
-- kio (Ok Accesstime, ModTime all need #define (**APPLE**) as the Unix time structure is different.)
+- kded 
+- kio 
 - knotifyconfig
 - kservice
 - kPlotting
-- kPackage (Removed all Language except En_Gb ... sorry :( ))
-- attika (no K at the start)
+- kPackage 
+- attika 
 - kNewStuff
+
+Typically I would wrap this is a bash script - but some (not all) needed some *adjusting*.
 
 ### Building 1 Module
 
@@ -163,10 +167,10 @@ It is the same *<https://invent.kde.org/frameworks/>* then with the **package** 
 
 We enter the folder, and get setup
 
-    cd kcoreaddons
+    cd kcoreaddons. #cd <package> 
     mkdir build 
     cd build 
-    cp ../../t.sh .
+    cp ../../t.sh .   #Copy my helper script 
 
 So we create a build folder, go into it, then copy the t.sh template - next we execute it
 
@@ -178,32 +182,52 @@ For 90% of KF6 Framework this is all you have to do.
 
 ## The Problem modules
 
+Problem is a little mean, We are compiling on a Mac (Darwin) something that expects to be running on Linux, so some adjustment is necessary.
+
+If there are any missing mods, I apologize. This process took a few days.
+
 ### breeze-icons
 
-This needed a *fix* (hack?) in the CMakeFiles.txt; I needed it to use a Virtual Python Environment, into which I had installed lxml
+This needed a *fix* (hack?) in the CMakeFiles.txt; I needed it to use a Virtual Python Environment, into which I had installed lxml (I did not want to force lxml into the main python env, nor should you).
+
+Change in CMakeFile.txt 
 
 - find_package(Python 3 COMPONENTS Interpreter REQUIRED)
-
 - find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
-  This is the change I made.
+
+This is the change I made, after that
+
+    rm CMakeCache.txt
+    ./t.sh   
+ 
 
 ### solid
 
 The installed version of *bison* is too old by default on a mac, and I needed to force a brew update.
 
+    brew install bison 
+    
+check the version with 
+
+    bison -V
+
+I had flashback to university days, I was expecting yacc and lex next.
+
 ### kdocbook
 
-This was the most difficult to install. Due to the non english languages being built. My solution (I do apoliogize), was to remove all translation files in the source folder.
+This was the most difficult to install. Due to the non english languages being built. My solution (I do apoliogize), was to remove all translation files in the source folder except english.
 
 This also required some more brew packages
 
     brew install docbook docbook-xsl libxslt fop 
 
-And finally I needed it's utility script updating to
+But as some of these brew packages conflict with some system libraries they are not in the PATH (hence the *adjusting* of the build script).
+
+And finally I needed a slightly modified *t.sh* script
 
 ```
-PATH=/Users/tim/Dev/QtCompiler/6.10.1/macos/bin:$PATH
+PATH=~/Dev/QtCompiler/6.10.1/macos/bin:$PATH
 export XML2_DIR=$(brew --prefix libxml2)
 export XSLT_DIR=$(brew --prefix libxslt)
 
@@ -231,21 +255,22 @@ cmake --install .
 
 Another *language* issue. Solved by removing all language files in the po folder except *en_GB*
 
-### kio
+### kio 
 
-It is sad to see the KF6 framework, not even thinking of DARWIN, it has OS based compiles for WINDOWS and OTHER !!
+It is sad to see the KF6 framework, not even thinking of DARWIN, it has OS based compiles for WINDOWS and OTHER !! But was not a major issue.
 
-I had to modify the following files
+I had to modify the following files 
 
- modified:   src/core/udsentry.cpp
- modified:   src/kioworkers/file/stat_unix.h
- modified:   src/kioworkers/trash/kio_trash.cpp
+	modified:   src/core/udsentry.cpp
+	modified:   src/kioworkers/file/stat_unix.h
+	modified:   src/kioworkers/trash/kio_trash.cpp
+	
+All 3 files have the same basic issue ... 
 
-All 3 files have the same basic issue ...
+The file access structure has a different naming system on Mac, than on linux... 
 
-The file access structure has a different naming system on Mac, than on linux...
 
-So the changes will be something like this
+So the changes will be something like this 
 
 ```C++
 +#if defined(__APPLE__)
@@ -261,23 +286,23 @@ So the changes will be something like this
 +  d->insert(UDS_LOCAL_GROUP_ID, buff.st_gid);
  #endif
 ```
-
-### kPackage
-
+ 
+ 
+### kPackage 
+ 
  Another Language issue - solved the same way.... I only left *en_GB*
+ 
+ 
+#KStars Build 
 
- Ok At this point we return to the Original KStars scipt
-
-# KStars Build
-
-With KF6 Framework build we return to the kstars/build directory, and
+With KF6 Framework build we return to the kstars/build directory, and 
 
     rm CMakeCache.txt 
     ./t.sh 
     make -j4
     
     
-And we (hopefully) see
+And we (hopefully) see 
 
 ```text
 tim@Tim-M1 build % make
@@ -300,7 +325,4 @@ tim@Tim-M1 build % make
 ```
 
 Well-done KStars built Natively on a Mac.  
-
-## To Run
-
-    ./kstars/KStars.app/Contents/MacOS/kstars
+ 
