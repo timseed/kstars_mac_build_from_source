@@ -301,8 +301,8 @@ With KF6 Framework build we return to the kstars/build directory, and
     ./t.sh 
     make -j4
     
-    
-And we (hopefully) see 
+ 
+And we (hopefully) see
 
 ```text
 tim@Tim-M1 build % make
@@ -325,4 +325,7 @@ tim@Tim-M1 build % make
 ```
 
 Well-done KStars built Natively on a Mac.  
+ 
+ 
+![](img/kstar_ver.png)
  
