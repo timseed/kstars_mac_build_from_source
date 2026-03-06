@@ -57,3 +57,21 @@ If the connection works, the button will be green.
 ![](/img/ek_05.png)
 
 When you have checked all devices are connected ok, you can Close this using the Close button at the bottom.
+
+# What next ?
+
+It is up to you
+
+Can you ....
+
+    - Control the scope ?
+    - Take an image ? (It will not look like the real thing)
+    - Use the Guider ?
+    - Plate Solve ?
+    - Check Polar alignment (Needs plate solving 1st)
+
+This is where you can play - no matter what the weather.
+
+## And then ?
+
+Use it for real !!
