@@ -13,18 +13,37 @@ Next, my environment for development is set as the following
   - **NOT** I repeat *NOT* using brew for provide QT
   - I am using QT 6.10.1 (QT5 is too old imho)
 - brew is installed, and I use for general packages, eigen etc. But **NOT** for QT
-  - openCV was build from source not using brew, as this pulled in QT6 
-  - I have a typical development base with brew (cmake cmake-extras etc) 
+  - openCV was build from source not using brew, as this pulled in QT6
+  - I have a typical development base with brew (cmake cmake-extras etc)
+
+### Brew Packages
+
+I do clear out !! brew every now and then, so this is relatively applicable (but as I see ollama I can tell some packages are not needed), but this is what my brew installed packages are
+
+```
+ada-url   dbus   gdbm   jpeg-turbo  libssh2   libxi   mlx   pango   telnet
+aria2   deno   gettext   lame   libthai   libxinerama  mlx-c   pcre2   tig
+astrometry-net  docbook   giflib   libdatrie  libtiff   libxml2   mpdecimal  pixman   tree-sitter@0.25
+bison   docbook-xsl  glib   libev   libunistring  libxrandr  mpfr   pkcs11-helper  unibilium
+brotli   eigen   gmp   libgcrypt  libusb   libxrender  ncurses   pkgconf   utf8proc
+c-ares   extra-cmake-modules graphite2  libgpg-error  libuv   libxslt   neovim   python@3.10  uvwasi
+ca-certificates  ffmpeg   gsl   libidn2   libvpx   libxv   netpbm   python@3.14  wcslib
+cairo   fmt   harfbuzz  libmpc   libx11   little-cms2  node   readline  wget
+ccfits   fontconfig  hdrhistogram_c  libnghttp2  libxau   llhttp   numpy   sdl2   x264
+certifi   fop   html-xml-utils  libnghttp3  libxcb   lpeg   ollama   sdl3   x265
+cfitsio   freerdp   icu4c@78  libngtcp2  libxcursor  luajit   openblas  sdl3_ttf  xorgproto
+cjson   freetype  iperf3   libnova   libxdmcp  luv   openjdk   simdjson  xz
+cmake   fribidi   isl   libomp   libxext   lz4   openssl@3  sqlite   yt-dlp
+dav1d   gcc   jasper   libpng   libxfixes  lzo   opus   svt-av1   zstd
+```
 
 ## Get kstars Source
 
 A simple git clone
 
-	cd ~/Dev/C++/Astro # Or where you want 
+ cd ~/Dev/C++/Astro # Or where you want 
     git clone https://github.com/KDE/kstars 
     cd kstars #We are now in the main source folder
-
-
 
 As the CMake commands can get a little complex - I usually use a small bash script to make this more repeatable
 
@@ -83,7 +102,7 @@ If the package is found ...
 
 I am sorry that I do not have a list of packages I have installed, but as I have already been coding in FITS/Indi etc.... it is probably best you assemble this for yourself.
 
-**Until** you get the **KF6 Framework** not found. This is a whole different issue.... 
+**Until** you get the **KF6 Framework** not found. This is a whole different issue....
 
 # KF6 Framework
 
@@ -130,26 +149,26 @@ So I believe you need to build in this Order - please note I am not an expert of
 - kitemviews
 - kcodecs
 - kcolorscheme
-- breeze-icons 
+- breeze-icons
 - kiconthemes
 - kconfigwidgets
 - kxmlgui
 - kcompletion
-- solid 
+- solid
 - kwindowsystem
-- kdocbook 
+- kdocbook
 - kbookmarks
 - knotifications
 - kjobwidgets
 - khelp
 - kdbusaddons
-- kded 
-- kio 
+- kded
+- kio
 - knotifyconfig
 - kservice
 - kPlotting
-- kPackage 
-- attika 
+- kPackage
+- attika
 - kNewStuff
 
 Typically I would wrap this is a bash script - but some (not all) needed some *adjusting*.
@@ -190,17 +209,15 @@ If there are any missing mods, I apologize. This process took a few days.
 
 This needed a *fix* (hack?) in the CMakeFiles.txt; I needed it to use a Virtual Python Environment, into which I had installed lxml (I did not want to force lxml into the main python env, nor should you).
 
-Change in CMakeFile.txt 
+Change in CMakeFile.txt
 
 - find_package(Python 3 COMPONENTS Interpreter REQUIRED)
 - find_package(Python3 COMPONENTS Interpreter REQUIRED)
-
 
 This is the change I made, after that
 
     rm CMakeCache.txt
     ./t.sh   
- 
 
 ### solid
 
@@ -208,7 +225,7 @@ The installed version of *bison* is too old by default on a mac, and I needed to
 
     brew install bison 
     
-check the version with 
+check the version with
 
     bison -V
 
@@ -255,22 +272,21 @@ cmake --install .
 
 Another *language* issue. Solved by removing all language files in the po folder except *en_GB*
 
-### kio 
+### kio
 
 It is sad to see the KF6 framework, not even thinking of DARWIN, it has OS based compiles for WINDOWS and OTHER !! But was not a major issue.
 
-I had to modify the following files 
+I had to modify the following files
 
-	modified:   src/core/udsentry.cpp
-	modified:   src/kioworkers/file/stat_unix.h
-	modified:   src/kioworkers/trash/kio_trash.cpp
-	
-All 3 files have the same basic issue ... 
+ modified:   src/core/udsentry.cpp
+ modified:   src/kioworkers/file/stat_unix.h
+ modified:   src/kioworkers/trash/kio_trash.cpp
+ 
+All 3 files have the same basic issue ...
 
-The file access structure has a different naming system on Mac, than on linux... 
+The file access structure has a different naming system on Mac, than on linux...
 
-
-So the changes will be something like this 
+So the changes will be something like this
 
 ```C++
 +#if defined(__APPLE__)
@@ -286,22 +302,20 @@ So the changes will be something like this
 +  d->insert(UDS_LOCAL_GROUP_ID, buff.st_gid);
  #endif
 ```
- 
- 
-### kPackage 
- 
- Another Language issue - solved the same way.... I only left *en_GB*
- 
- 
-#KStars Build 
 
-With KF6 Framework build we return to the kstars/build directory, and 
+### kPackage
+
+ Another Language issue - solved the same way.... I only left *en_GB*
+
+# KStars Build
+
+With KF6 Framework build we return to the kstars/build directory, and
 
     rm CMakeCache.txt 
     ./t.sh 
     make -j4
     
- 
+
 And we (hopefully) see
 
 ```text
@@ -325,7 +339,11 @@ tim@Tim-M1 build % make
 ```
 
 Well-done KStars built Natively on a Mac.  
- 
- 
+
 ![](img/kstar_ver.png)
- 
+
+# Run A Simulator and have a play
+
+Please follow this simulator [](./simulator.md)
+
+
