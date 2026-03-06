@@ -41,8 +41,8 @@ dav1d   gcc   jasper   libpng   libxfixes  lzo   opus   svt-av1   zstd
 
 A simple git clone
 
- cd ~/Dev/C++/Astro # Or where you want 
-    git clone https://github.com/KDE/kstars 
+ cd ~/Dev/C++/Astro # Or where you want
+    git clone <https://github.com/KDE/kstars>
     cd kstars #We are now in the main source folder
 
 As the CMake commands can get a little complex - I usually use a small bash script to make this more repeatable
@@ -281,7 +281,7 @@ I had to modify the following files
  modified:   src/core/udsentry.cpp
  modified:   src/kioworkers/file/stat_unix.h
  modified:   src/kioworkers/trash/kio_trash.cpp
- 
+
 All 3 files have the same basic issue ...
 
 The file access structure has a different naming system on Mac, than on linux...
@@ -344,6 +344,4 @@ Well-done KStars built Natively on a Mac.
 
 # Run A Simulator and have a play
 
-Please follow this simulator [](./simulator.md)
-
-
+Please follow this simulator [Simulator Setup](./simulator.md)

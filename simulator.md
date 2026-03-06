@@ -108,4 +108,5 @@ Next phase will be to configure **Ekos** to use these
 
 This too is easy to accomplish.
 
-The guide for (Ekos Simulator Setup)[./ekos_sim.md] will help you.
+
+The guide for [Ekos Simulator Setup](./ekos_sim.md) will help you.
